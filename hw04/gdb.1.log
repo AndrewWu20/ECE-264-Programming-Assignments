@@ -1,0 +1,120 @@
+Starting program: /home/shay/a/wu1795/hw04/prime_factor 
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7afcba0 in __write_nocancel () from /lib64/libc.so.6
+Quit
+Starting program: /home/shay/a/wu1795/hw04/prime_factor 
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7afcba0 in __write_nocancel () from /lib64/libc.so.6
+Starting program: /home/shay/a/wu1795/hw04/prime_factor 
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7afcba0 in __write_nocancel () from /lib64/libc.so.6
+1	/* vim: set tabstop=4 shiftwidth=4 fileencoding=utf-8 noexpandtab: */
+2	#include <stdio.h>
+3	#include <stdlib.h>
+4	#include "prime_factor.h"
+5	
+6	int main(int argc, char* argv[]) {
+7		print_prime_factors(6);
+8		print_prime_factors(1);  // should report "(none)"
+9		print_prime_factors(0);  // should report "(none)"
+10		print_prime_factors(48); // 2 2 2 2 3
+#0  0x00007ffff7afcba0 in __write_nocancel () from /lib64/libc.so.6
+#1  0x00007ffff7a872f3 in _IO_file_write@@GLIBC_2.2.5 () from /lib64/libc.so.6
+#2  0x00007ffff7a88b0e in __GI__IO_do_write () from /lib64/libc.so.6
+#3  0x00007ffff7a87a50 in __GI__IO_file_xsputn () from /lib64/libc.so.6
+#4  0x00007ffff7a57ec5 in vfprintf () from /lib64/libc.so.6
+#5  0x00007ffff7a604e9 in printf () from /lib64/libc.so.6
+#6  0x0000000000400637 in print_prime_factors (n=0) at prime_factor.c:29
+#7  0x00000000004006d6 in main (argc=1, argv=0x7fffffffdb18)
+    at test_prime_factor.c:7
+#6  0x0000000000400637 in print_prime_factors (n=0) at prime_factor.c:29
+29	                printf(" %d", 2);
+Stack level 6, frame at 0x7fffffffda20:
+ rip = 0x400637 in print_prime_factors (prime_factor.c:29); 
+    saved rip = 0x4006d6
+ called by frame at 0x7fffffffda40, caller of frame at 0x7fffffffd9f0
+ source language c.
+ Arglist at 0x7fffffffda10, args: n=0
+ Locals at 0x7fffffffda10, Previous frame's sp is 0x7fffffffda20
+ Saved registers:
+  rbp at 0x7fffffffda10, rip at 0x7fffffffda18
+n = 0
+Undefined command: "code".  Try "help".
+List of classes of commands:
+
+aliases -- Aliases of other commands.
+breakpoints -- Making program stop at certain points.
+data -- Examining data.
+files -- Specifying and examining files.
+internals -- Maintenance commands.
+obscure -- Obscure features.
+running -- Running the program.
+stack -- Examining the stack.
+status -- Status inquiries.
+support -- Support facilities.
+tracepoints -- Tracing of program execution without stopping the program.
+user-defined -- User-defined commands.
+
+Type "help" followed by a class name for a list of commands in that class.
+Type "help all" for the list of all commands.
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Type "apropos -v word" for full documentation of commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+Examining the stack.
+The stack is made up of stack frames.  Gdb assigns numbers to stack frames
+counting from zero for the innermost (currently executing) frame.
+
+At any time gdb identifies one frame as the "selected" frame.
+Variable lookups are done with respect to the selected frame.
+When the program being debugged stops, gdb selects the innermost frame.
+The commands below can be used to select other frames by number or address.
+
+List of commands:
+
+backtrace -- Print backtrace of all stack frames, or innermost COUNT frames.
+bt -- Print backtrace of all stack frames, or innermost COUNT frames.
+down -- Select and print stack frame called by this one.
+faas -- Apply a command to all frames (ignoring errors and empty output).
+frame -- Select and print a stack frame.
+frame address -- Select and print a stack frame by stack address.
+frame apply -- Apply a command to a number of frames.
+frame apply all -- Apply a command to all frames.
+frame apply level -- Apply a command to a list of frames.
+frame function -- Select and print a stack frame by function name.
+frame level -- Select and print a stack frame by level.
+frame view -- View a stack frame that might be outside the current backtrace.
+Quit
+#6  0x0000000000400637 in print_prime_factors (n=0) at prime_factor.c:29
+29	                printf(" %d", 2);
+Missing address argument to view a frame
+Breakpoint 1 at 0x4006cc: file test_prime_factor.c, line 7.
+Starting program: /home/shay/a/wu1795/hw04/prime_factor 
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffdb18) at test_prime_factor.c:7
+7		print_prime_factors(6);
+print_prime_factors (n=6) at prime_factor.c:17
+17	    if(n <= 0) {
+21	        printf("Prime factors of %d:", n);
+23	        if(n == 1) {
+28	            while(n % 2 == 0) {
+Breakpoint 2 at 0x400648: file prime_factor.c, line 28.
+Starting program: /home/shay/a/wu1795/hw04/prime_factor 
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffdb18) at test_prime_factor.c:7
+7		print_prime_factors(6);
+Continuing.
+
+Breakpoint 2, print_prime_factors (n=6) at prime_factor.c:28
+28	            while(n % 2 == 0) {
+$1 = 6
+29	                printf(" %d", 2);
+30	                n %= 2;  // Divide n by 2 (integer division)
+$2 = 6
+
+Breakpoint 2, print_prime_factors (n=0) at prime_factor.c:28
+28	            while(n % 2 == 0) {
+$3 = 0

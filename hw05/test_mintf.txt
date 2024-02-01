@@ -1,0 +1,13 @@
+
+98275927
+
+The percentage is 20%
+The first letter of apple is a
+Purdue is in Indiana
+0b1111101
+0x3d9
+Tommy has 3 dogs.
+There are 20 red, 50 green, and 30 blue balls in the bag.
+After buying a $10.01 phone, Ryan has -$1.11 and is currently in debt.
+The number 47 is 0b101111 in binary.
+Invalid test: %a

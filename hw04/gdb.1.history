@@ -1,0 +1,32 @@
+set logging file gdb.1.log
+set logging on
+set history filename gdb.1.history
+set history save
+run
+run
+run
+run
+list
+bt
+frame 6
+info frame
+info args
+code frame
+help
+help stack
+frame
+frame view
+break test_prime_factor.c:main
+run
+step
+step
+next
+break prime_factor.c:28
+run
+continue
+print n
+step
+print n
+step
+print n
+quit
