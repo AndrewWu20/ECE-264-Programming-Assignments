@@ -1,0 +1,12 @@
+Before tree_sort_array(array1)
+5 4 2 1 7 6 3 
+
+After  tree_sort_array(array1)
+1 2 3 4 5 6 7 
+
+IGNORE: Before quick_sort_array(array2)
+IGNORE: 5 4 2 1 7 6 3 
+IGNORE: 
+IGNORE: After  quick_sort_array(array2)
+IGNORE: 1 2 3 4 5 6 7 
+IGNORE: 

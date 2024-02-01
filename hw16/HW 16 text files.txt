@@ -1,0 +1,8 @@
+Valid.txt:
+abcdefghijklmnopqrstuvwxyz
+
+Obscure.txt:
+~~~
+<
+:
+;

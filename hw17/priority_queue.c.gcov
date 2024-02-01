@@ -1,0 +1,63 @@
+        -:    0:Source:priority_queue.c
+        -:    0:Programs:3
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <stdbool.h>
+        -:    4:#include <assert.h>
+        -:    5:#include "priority_queue.h"
+        -:    6:
+        -:    7:
+       19:    8:Node* pq_enqueue(Node** a_head, void* a_value, int (*cmp_fn)(void const*, void const*)) {
+       19:    9:	Node* new_node = malloc(sizeof(*new_node));				//Malloc an empty node
+       19:   10:	*new_node = (Node) {.a_value = a_value, .next = NULL};
+        -:   11:	
+       19:   12:	if (*a_head == NULL || (cmp_fn((*a_head) -> a_value, (new_node -> a_value)) >= 0)) {						//Check if a_head is null
+        5:   13:		Node *temp_address = (*a_head);			//Sets value of next head to the old head
+        5:   14:		*a_head = new_node;						
+        5:   15:		new_node -> next = temp_address;
+        -:   16:	}
+        -:   17:	else {
+       14:   18:		Node *current_address = *a_head;
+       31:   19:		while((current_address -> next != NULL) && (cmp_fn(current_address -> next -> a_value, (new_node -> a_value)) < 0)) {	//Goes through node and moves address of node forwards given that the current node is greater than the next and if it isn't at the end of the list
+       17:   20:			current_address = current_address -> next;
+        -:   21:		}
+       14:   22:		new_node -> next = (current_address -> next);	//Inserts a new node
+       14:   23:		current_address -> next = new_node;
+        -:   24:
+        -:   25:	}	
+        -:   26:	
+       19:   27:	return new_node;
+        -:   28:}
+        -:   29:
+        -:   30:
+       19:   31:Node* pq_dequeue(Node** a_head) {
+       19:   32:	Node* remove_node = (*a_head);				//Store address
+       19:   33:	if (a_head != NULL) {
+       19:   34:		(*a_head) = (*a_head) -> next;				//Reference next node in list
+       19:   35:		remove_node -> next = NULL;					//Sets the next field of remove_node equal to null
+        -:   36:	}
+        -:   37:
+       19:   38:	return remove_node;  
+        -:   39:}
+        -:   40:
+        -:   41:
+    #####:   42:Node* stack_push(Node** a_head, void* a_value) {
+    #####:   43:	return pq_enqueue(a_head, a_value, NULL);	//Push list to create space at the front of the list
+        -:   44:}
+        -:   45:
+        -:   46:
+    #####:   47:Node* stack_pop(Node** a_head) {
+    #####:   48:	return pq_dequeue(a_head); 					//Remove first position of list
+        -:   49:}
+        -:   50:
+        -:   51:
+        2:   52:void destroy_list(Node** a_head, void (*destroy_value_fn)(void*)) {			//Function frees the list	
+       21:   53:	while (*a_head != NULL) {
+       19:   54:		Node* destroy = pq_dequeue(a_head);
+       19:   55:		destroy_value_fn((destroy) -> a_value);
+       19:   56:		free(destroy);
+        -:   57:	}
+        2:   58:}
+        -:   59:
+        -:   60:
+        -:   61:#define HUFFMAN_C_V1

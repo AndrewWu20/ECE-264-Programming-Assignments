@@ -1,0 +1,44 @@
+        -:    0:Source:huffman.c
+        -:    0:Programs:3
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <stdbool.h>
+        -:    4:#include <assert.h>
+        -:    5:#include "huffman.h"
+        -:    6:
+        -:    7:static int _compare_func(const void*, const void*);								//Helper function declaration
+        -:    8:
+       47:    9:static int _compare_func(const void* void_next, const void* void_curr) {		//Compare helper function
+       47:   10:	TreeNode const* new = void_next;											//Declarations for TreeNode and integer variables
+       47:   11:	TreeNode const* current = void_curr;
+       47:   12:	int current_value = (int)(((TreeNode*)void_curr) -> frequency);
+       47:   13:	int compare_value = (int)(((TreeNode*)void_next) -> frequency);
+        -:   14:
+       47:   15:	if (current_value > compare_value) {										//Add one to frequency if the value being compared is less than the current value in the list
+        3:   16:		return 1;
+        -:   17:
+        -:   18:	}
+       44:   19:	else if (current_value < compare_value) {									//Subtract one from frequency if the value is being compared is greater than the current value in the list
+       31:   20:		return -1;
+        -:   21:	}
+        -:   22:	
+       13:   23:	else if (current_value == compare_value) {									//If the values are equal, place the character with a lesser ASCII value first
+       13:   24:		if(new -> character > current -> character) {
+    #####:   25:			return -1;
+        -:   26:		}
+        -:   27:	}
+       13:   28:	return 0;
+        -:   29:}
+        -:   30:
+        2:   31:Node* make_huffman_pq(Frequencies freqs) {										//Makes the list for values to be placed into
+        2:   32:	Node* node = NULL;
+      514:   33:	for(int i = 0; i < 256; i++) {
+      512:   34:		if(freqs[i] != 0) {
+       19:   35:			TreeNode* tree = malloc(sizeof(*tree));
+       19:   36:			*tree = (TreeNode) { .character = i, .frequency = freqs[i], .character = i, .left = NULL, .right = NULL};
+       19:   37:			pq_enqueue(&node, tree, _compare_func);
+        -:   38:		}
+        -:   39:	}
+        2:   40:	return node;
+        -:   41:}
+        -:   42:/* vim: set tabstop=4 shiftwidth=4 fileencoding=utf-8 noexpandtab: */
