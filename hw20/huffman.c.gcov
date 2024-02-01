@@ -1,0 +1,85 @@
+        -:    0:Source:huffman.c
+        -:    0:Programs:4
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <stdbool.h>
+        -:    4:#include <assert.h>
+        -:    5:#include "huffman.h"
+        -:    6:
+        -:    7:static int _compare_func(const void*, const void*);								//Helper function declaration
+        -:    8:
+        -:    9:
+      192:   10:static int _compare_func(const void* void_curr, const void* void_next) {		//Compare helper function
+      192:   11:	TreeNode const* new = void_next;											//Declarations for TreeNode and integer variables
+      192:   12:	TreeNode const* current = void_curr;
+      192:   13:	int current_value = (int)(((TreeNode*)void_curr) -> frequency);
+      192:   14:	int compare_value = (int)(((TreeNode*)void_next) -> frequency);
+      192:   15:	int result = 0;
+        -:   16:
+      192:   17:	if(current_value > compare_value) {								//Add one to frequency if the value being compared is less than the current value in the list
+       25:   18:		result = 1;
+        -:   19:	}
+      167:   20:	else if(current_value < compare_value) {						//Subtract one from frequency if the value is being compared is greater than the current value in the list
+       94:   21:		result = -1;
+        -:   22:	}
+       73:   23:	else if(current_value == compare_value) {						//If the values are equal, place the character with a lesser ASCII value first
+       73:   24:		if((new -> character) > (current -> character) || new -> character == '\0') {
+       73:   25:			result = -1;
+        -:   26:		}
+        -:   27:	}
+      192:   28:	return result;
+        -:   29:}
+        -:   30:
+        6:   31:Node* make_huffman_pq(Frequencies freqs) {										//Makes the list for values to be placed into
+        6:   32:	Node* node = NULL;
+     1542:   33:	for(int i = 0; i < 256; i++) {
+     1536:   34:		if(freqs[i] != 0) {
+       34:   35:			TreeNode* tree = malloc(sizeof(*tree));
+       34:   36:			*tree = (TreeNode) { .character = i, .frequency = freqs[i], .character = i, .left = NULL, .right = NULL};
+       34:   37:			pq_enqueue(&node, tree, _compare_func);
+        -:   38:		}
+        -:   39:	}
+        6:   40:	return node;
+        -:   41:}
+        -:   42:
+        4:   43:TreeNode* make_huffman_tree(Node* head) {
+        4:   44:	if(head == NULL) {
+    #####:   45:		return NULL;
+        -:   46:	}
+       15:   47:	while(head -> next != NULL) {
+       11:   48:		TreeNode* cluster = malloc(sizeof(*cluster));			//Creates memory for cluster	//Valgrind error, thinking that I don't free cluster?
+       11:   49:		TreeNode* tree_value = head -> a_value;					//TreeNode variables
+       11:   50:		TreeNode* tree_next_value = head -> next -> a_value;
+       11:   51:		*cluster = (TreeNode) { .character = '\0', .left = tree_value, .right = tree_next_value, .frequency = (tree_value -> frequency) + (tree_next_value -> frequency) };												//Compound literal for cluster	
+       11:   52:		pq_enqueue(&head, cluster, _compare_func);
+       11:   53:		free(pq_dequeue(&head));
+       11:   54:		free(pq_dequeue(&head));
+        -:   55:	}
+        4:   56:	TreeNode* new_value = head -> a_value;						//Create a temporary variable so head can be freed
+        4:   57:	free(head);
+        4:   58:	return new_value;
+        -:   59:}
+        -:   60:
+       56:   61:void destroy_huffman_tree(TreeNode** a_root) {
+       56:   62:	if(*a_root != NULL) {									//If the root is not null, call destroy function to destroy the left and right nodes
+       26:   63:		destroy_huffman_tree(&(*a_root) -> left);
+       26:   64:		destroy_huffman_tree(&(*a_root) -> right);
+       26:   65:		free(*a_root);
+        -:   66:	}
+       56:   67:	*a_root = NULL;
+       56:   68:}
+        -:   69:
+       49:   70:void write_coding_table(TreeNode* root, BitWriter* a_writer) {
+       49:   71:	if(root != NULL) {										//If the root is not null, go through the tree
+       23:   72:		write_coding_table(root -> left, a_writer);
+       23:   73:		write_coding_table(root -> right, a_writer);
+       23:   74:		if(root -> character != '\0') {						//If the character is a leaf, write 1 and then the character
+       13:   75:			write_bits(a_writer, 1, 1);
+       13:   76:			write_bits(a_writer, root -> character, 8);
+        -:   77:		}
+        -:   78:		else {												//Otherwise it is a cluster, writes zero and moves on
+       10:   79:			write_bits(a_writer, 0x00, 1);
+        -:   80:		}
+        -:   81:	}
+       49:   82:}
+        -:   83:/* vim: set tabstop=4 shiftwidth=4 fileencoding=utf-8 noexpandtab: */
