@@ -1,0 +1,108 @@
+        -:    0:Source:huffman.c
+        -:    0:Programs:4
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <stdbool.h>
+        -:    4:#include <assert.h>
+        -:    5:#include "huffman.h"
+        -:    6:
+        -:    7:static int _compare_func(const void*, const void*);								//Helper function declaration
+        -:    8:
+        -:    9:static void _traverse_func(TreeNode* root, BitWriter* a_writer);				//Helper function declaration
+        -:   10:
+      243:   11:static int _compare_func(const void* void_curr, const void* void_next) {		//Compare helper function
+      243:   12:	TreeNode const* new = void_next;											//Declarations for TreeNode and integer variables
+      243:   13:	TreeNode const* current = void_curr;
+      243:   14:	int current_value = (int)(((TreeNode*)void_curr) -> frequency);
+      243:   15:	int compare_value = (int)(((TreeNode*)void_next) -> frequency);
+      243:   16:	int result = 0;
+        -:   17:
+      243:   18:	if(current_value > compare_value) {								//Add one to frequency if the value being compared is less than the current value in the list
+       25:   19:		result = 1;
+        -:   20:	}
+      218:   21:	else if(current_value < compare_value) {						//Subtract one from frequency if the value is being compared is greater than the current value in the list
+      120:   22:		result = -1;
+        -:   23:	}
+       98:   24:	else if(current_value == compare_value) {						//If the values are equal, place the character with a lesser ASCII value first
+       98:   25:		if((new -> character) > (current -> character) || new -> character == '\0') {
+       98:   26:			result = -1;
+        -:   27:		}
+        -:   28:	}
+      243:   29:	return result;
+        -:   30:}
+        -:   31:
+       16:   32:static void _traverse_func(TreeNode* root, BitWriter* a_writer) {				//Helper function that traverses a tree
+       16:   33:	if(root != NULL) {
+       16:   34:		if(root -> left == NULL && root -> right == NULL) {
+        9:   35:			binary_of_leaf[root -> character] = (_Code) { .bits = a_writer -> current_byte, .num_bits = 8 - (a_writer -> num_bits_left) };
+        -:   36:		}
+        -:   37:		else {
+        7:   38:			write_bits(a_writer, 0x00, 1);
+        7:   39:			_traverse_func(root -> left, a_writer);
+        7:   40:			write_bits(a_writer, 0xFF, 1);
+        7:   41:			_traverse_func(root -> right, a_writer);
+        -:   42:		}
+        -:   43:	}
+       16:   44:}
+        -:   45:
+        8:   46:Node* make_huffman_pq(Frequencies freqs) {										//Makes the list for values to be placed into
+        8:   47:	Node* node = NULL;
+     2056:   48:	for(int i = 0; i < 256; i++) {
+     2048:   49:		if(freqs[i] != 0) {
+       43:   50:			TreeNode* tree = malloc(sizeof(*tree));
+       43:   51:			*tree = (TreeNode) { .character = i, .frequency = freqs[i], .character = i, .left = NULL, .right = NULL};
+       43:   52:			pq_enqueue(&node, tree, _compare_func);
+        -:   53:		}
+        -:   54:	}
+        8:   55:	return node;
+        -:   56:}
+        -:   57:
+        6:   58:TreeNode* make_huffman_tree(Node* head) {
+        6:   59:	if(head == NULL) {
+    #####:   60:		return NULL;
+        -:   61:	}
+       24:   62:	while(head -> next != NULL) {
+       18:   63:		TreeNode* cluster = malloc(sizeof(*cluster));			//Creates memory for cluster	//Valgrind error, thinking that I don't free cluster?
+       18:   64:		TreeNode* tree_value = head -> a_value;					//TreeNode variables
+       18:   65:		TreeNode* tree_next_value = head -> next -> a_value;
+       18:   66:		*cluster = (TreeNode) { .character = '\0', .left = tree_value, .right = tree_next_value, .frequency = (tree_value -> frequency) + (tree_next_value -> frequency) };												//Compound literal for cluster	
+       18:   67:		pq_enqueue(&head, cluster, _compare_func);
+       18:   68:		free(pq_dequeue(&head));
+       18:   69:		free(pq_dequeue(&head));
+        -:   70:	}
+        6:   71:	TreeNode* new_value = head -> a_value;						//Create a temporary variable so head can be freed
+        6:   72:	free(head);
+        6:   73:	return new_value;
+        -:   74:}
+        -:   75:
+       90:   76:void destroy_huffman_tree(TreeNode** a_root) {
+       90:   77:	if(*a_root != NULL) {									//If the root is not null, call destroy function to destroy the left and right nodes
+       42:   78:		destroy_huffman_tree(&(*a_root) -> left);
+       42:   79:		destroy_huffman_tree(&(*a_root) -> right);
+       42:   80:		free(*a_root);
+        -:   81:	}
+       90:   82:	*a_root = NULL;
+       90:   83:}
+        -:   84:
+       49:   85:void write_coding_table(TreeNode* root, BitWriter* a_writer) {
+       49:   86:	if(root != NULL) {										//If the root is not null, go through the tree
+       23:   87:		write_coding_table(root -> left, a_writer);
+       23:   88:		write_coding_table(root -> right, a_writer);
+       23:   89:		if(root -> character != '\0') {						//If the character is a leaf, write 1 and then the character
+       13:   90:			write_bits(a_writer, 1, 1);
+       13:   91:			write_bits(a_writer, root -> character, 8);
+        -:   92:		}
+        -:   93:		else {												//Otherwise it is a cluster, writes zero and moves on
+       10:   94:			write_bits(a_writer, 0x00, 1);
+        -:   95:		}
+        -:   96:	}
+       49:   97:}
+        -:   98:
+        2:   99:void write_compressed(TreeNode* root, BitWriter* a_writer, uint8_t* uncompressed_bytes) {
+        2:  100:	_traverse_func(root, a_writer);							//Recursive helper function that stores path of nodes
+       11:  101:	for(int i = 0; i < root -> frequency; i++) {							//Loop uncompresses and outputs code to a file
+        9:  102:		int num_bits = binary_of_leaf[uncompressed_bytes[i]].num_bits;
+        9:  103:		write_bits(a_writer, binary_of_leaf[uncompressed_bytes[i]].bits >> (8 - num_bits), num_bits);
+        -:  104:	}
+        2:  105:}
+        -:  106:/* vim: set tabstop=4 shiftwidth=4 fileencoding=utf-8 noexpandtab: */
